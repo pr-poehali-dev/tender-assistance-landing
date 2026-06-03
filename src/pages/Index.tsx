@@ -224,7 +224,7 @@ export default function Index() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <a href="tel:+78001234567" className="text-sm text-white/90 font-medium">8 800 123-45-67</a>
+            <a href="tel:+79174905751" className="text-sm text-white/90 font-medium">+7 917 490-57-51</a>
             <button onClick={() => setModalOpen(true)}
               className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90"
               style={{ background: "#c9a03d" }}>
@@ -565,7 +565,7 @@ export default function Index() {
               </p>
               <div className="space-y-4">
                 {[
-                  { icon: "Phone", label: "Телефон", value: "8 800 123-45-67", href: "tel:+78001234567" },
+                  { icon: "Phone", label: "Телефон", value: "+7 917 490-57-51", href: "tel:+79174905751" },
                   { icon: "Mail", label: "Email", value: "info@tenderpro.ru", href: "mailto:info@tenderpro.ru" },
                   { icon: "Clock", label: "Режим работы", value: "Пн–Пт: 9:00–19:00", href: null },
                 ].map(({ icon, label, value, href }) => (
