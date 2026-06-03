@@ -3,6 +3,16 @@ import Icon from "@/components/ui/icon";
 
 
 const HERO_IMAGE = "https://cdn.poehali.dev/projects/1eecdf67-3b96-4300-8830-375376f7427c/files/400191c8-6667-4611-b847-6bb837fffbc3.jpg";
+const API_URL = "https://functions.poehali.dev/f5fbd2bc-b251-499c-ba1b-245ca5f8fb33";
+
+async function sendEmail(data: { name: string; phone: string; email: string; message?: string }) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Ошибка отправки');
+}
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -19,6 +29,7 @@ function useInView(threshold = 0.15) {
 
 function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "", consent: false });
 
   useEffect(() => {
@@ -29,9 +40,15 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
 
   if (!open) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    try {
+      await sendEmail({ name: form.name, phone: form.phone, email: form.email, message: form.message });
+    } finally {
+      setLoading(false);
+      setSent(true);
+    }
   };
 
   return (
@@ -70,9 +87,9 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
                     Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности
                   </span>
                 </label>
-                <button type="submit" className="w-full py-3.5 rounded-lg font-semibold text-white text-sm tracking-wide transition-all hover:opacity-90"
+                <button type="submit" disabled={loading} className="w-full py-3.5 rounded-lg font-semibold text-white text-sm tracking-wide transition-all hover:opacity-90 disabled:opacity-60"
                   style={{ background: "linear-gradient(135deg, #0a2b4e, #0d3660)" }}>
-                  Отправить заявку
+                  {loading ? "Отправляем..." : "Отправить заявку"}
                 </button>
               </form>
             </>
@@ -129,14 +146,26 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 function ContactForm() {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setSent(true); };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await sendEmail({ name: form.name, phone: form.phone, email: form.email });
+    } finally {
+      setLoading(false);
+      setSent(true);
+    }
+  };
+
   if (sent) return (
     <div className="text-center py-8">
       <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(10,43,78,0.08)" }}>
         <Icon name="CheckCircle" size={28} className="text-navy" />
       </div>
-      <h3 className="font-display text-xl font-bold text-navy mb-2">Заявка принята (демо)!</h3>
+      <h3 className="font-display text-xl font-bold text-navy mb-2">Заявка принята!</h3>
       <p className="text-gray-500 text-sm">Ответим в течение 30 минут в рабочее время</p>
     </div>
   );
@@ -154,9 +183,9 @@ function ContactForm() {
           <input type="checkbox" required checked={form.consent} onChange={e => setForm({ ...form, consent: e.target.checked })} className="mt-0.5" />
           <span className="text-xs text-gray-400 leading-relaxed">Согласен на обработку персональных данных</span>
         </label>
-        <button type="submit" className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90"
+        <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 disabled:opacity-60"
           style={{ background: "linear-gradient(135deg, #0a2b4e, #0d3660)" }}>
-          Отправить заявку
+          {loading ? "Отправляем..." : "Отправить заявку"}
         </button>
       </form>
     </>
